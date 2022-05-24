@@ -1,6 +1,6 @@
 package com.example.emailManagementApp.services;
 
-import com.example.emailManagementApp.dtos.request.MailBoxesRequest;
+
 import com.example.emailManagementApp.dtos.request.UserRequest;
 import com.example.emailManagementApp.dtos.request.UserRequestLogInDto;
 import com.example.emailManagementApp.dtos.response.UserDto;
@@ -9,7 +9,6 @@ import com.example.emailManagementApp.exceptions.EmailManagementAppException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
 import com.example.emailManagementApp.models.User;
 import com.example.emailManagementApp.repositories.UserRepository;
-import org.assertj.core.api.AbstractBigDecimalAssert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -65,7 +64,7 @@ class UserServiceImplTest {
         User user = new User();
         user.setEmail("newemail@gmail.com");
         user.setPassword("password");
-        user.setIslongIn(true);
+        user.setLogInStatus(true);
         userService.createUser("newemail@gmail.com","password");
         mailBoxesService.createMailBoxes("newemail@gmail.com");
 
@@ -92,7 +91,7 @@ class UserServiceImplTest {
         User user = new User();
         user.setEmail("newemail@gmail.com");
         user.setPassword("password");
-        user.setIslongIn(false);
+        user.setLogInStatus(false);
         userService.createUser("newemail@gmail.com","password");
         mailBoxesService.createMailBoxes("newemail@gmail.com");
 

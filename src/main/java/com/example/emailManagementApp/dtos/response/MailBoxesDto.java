@@ -1,5 +1,6 @@
 package com.example.emailManagementApp.dtos.response;
 
+import com.example.emailManagementApp.models.MailBox;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,5 +14,6 @@ import org.springframework.stereotype.Service;
 public class MailBoxesDto {
     private String userName;
     private String message;
+
 
 }

@@ -1,13 +1,17 @@
 package com.example.emailManagementApp.services;
 
+
+import com.example.emailManagementApp.dtos.response.CreateNewUserMessageDto;
 import com.example.emailManagementApp.dtos.response.MailBoxesDto;
 import com.example.emailManagementApp.models.MailBox;
 import com.example.emailManagementApp.models.MailBoxes;
+import com.example.emailManagementApp.models.Message;
 import com.example.emailManagementApp.repositories.MailBoxesRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,9 @@ public class MailBoxesServiceImpl implements MailBoxesService{
 
     private ModelMapper mapper;
 
+    @Autowired
+    MessageService messageService;
+
     @Override
     public MailBoxes createMailBoxes(String email)  {
         MailBoxes newMailBoxes = new MailBoxes();
@@ -30,6 +37,9 @@ public class MailBoxesServiceImpl implements MailBoxesService{
         MailBox receiveMailBox= new MailBox();
         receiveMailBox.setUserName(email);
         receiveMailBox.setMailboxType(INBOX);
+
+        CreateNewUserMessageDto createMailBoxes = new CreateNewUserMessageDto("newemail@gmail","admin@gmail.com","Welcome to gmail.com");
+        Message sendMessage = messageService.sendMessageToNewUser(createMailBoxes);
         newMailBoxes.getMailBox().add(receiveMailBox);
 
         MailBox sentMailBox = new MailBox();

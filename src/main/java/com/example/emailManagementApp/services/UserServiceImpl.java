@@ -48,24 +48,20 @@ public class UserServiceImpl implements UserService {
             User user = new User(email, password, new java.util.ArrayList<>(), false);
             mailBoxesService.createMailBoxes(email);
             User savedUser = userRepository.save(user);
-//            System.out.println(savedUser);
 
             return mapper.map(savedUser, UserDto.class);
+        } else {
+
+            throw new EmailManagementAppException("user with email and password alreadyExist");
         }
-
-        throw new EmailManagementAppException("user with email and password alreadyExist");
     }
-
     @Override
     public UserResponseLogIn userCreatedCanLogIn(UserRequestLogInDto request) {
         User foundUser = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
-        if (!foundUser.isIslongIn()) {
-            foundUser.setIslongIn(true);
+        if (!foundUser.isLogInStatus()) {
+           foundUser.setLogInStatus(true);
             userRepository.save(foundUser);
-//        }else {
-//            throw new UserDidNotLogInException("user didn't login");
-//        }
-//            userRepository.save(foundUser);
+
             System.out.println(foundUser);
             UserResponseLogIn userResponseLogIn = new UserResponseLogIn();
             userResponseLogIn.setPassword(request.getPassword());

@@ -49,6 +49,8 @@ public void testThatMailBoxesCanBeCreated(){
 
     assertThat(mailBoxesDto.getUserName()).isEqualTo("useremail@gmail.com");
     assertThat(mailBoxesDto.getMessage()).isEqualTo("user mailboxes created");
+
+
 }
 
 }

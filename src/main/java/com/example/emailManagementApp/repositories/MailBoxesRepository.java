@@ -1,6 +1,6 @@
 package com.example.emailManagementApp.repositories;
 
-import com.example.emailManagementApp.models.MailBox;
+
 import com.example.emailManagementApp.models.MailBoxes;
 //import com.example.emailManagementApp.models.Mailboxes;
 import org.springframework.data.mongodb.repository.MongoRepository;

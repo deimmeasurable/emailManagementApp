@@ -19,8 +19,8 @@ public class User {
     @Id
     private String email;
     private String password;
-    private List<Notification> message;
-    private boolean islongIn = false;
+    private List<Notification> notificationlist;
+    private boolean isLogInStatus = false;
 
 
 }
