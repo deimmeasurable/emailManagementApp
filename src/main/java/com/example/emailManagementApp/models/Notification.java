@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class Notification {
     private String title;
     private boolean isReadMessage;

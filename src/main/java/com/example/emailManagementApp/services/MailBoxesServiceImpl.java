@@ -38,8 +38,8 @@ public class MailBoxesServiceImpl implements MailBoxesService{
         receiveMailBox.setUserName(email);
         receiveMailBox.setMailboxType(INBOX);
 
-        CreateNewUserMessageDto createMailBoxes = new CreateNewUserMessageDto("newemail@gmail","admin@gmail.com","Welcome to gmail.com");
-        Message sendMessage = messageService.sendMessageToNewUser(createMailBoxes);
+//        CreateNewUserMessageDto createMailBoxes = new CreateNewUserMessageDto("newemail@gmail","admin@gmail.com","Welcome to gmail.com");
+//        Message sendMessage = messageService.sendMessageToNewUser();
         newMailBoxes.getMailBox().add(receiveMailBox);
 
         MailBox sentMailBox = new MailBox();
@@ -54,7 +54,7 @@ public class MailBoxesServiceImpl implements MailBoxesService{
         mailBoxesDto.setMessage(email+""+"mailboxes created for user");
 
 
-        System.out.println(newMailBoxes);
+//        System.out.println(newMailBoxes);
 
         return  newMailBoxes;
     }

@@ -7,6 +7,7 @@ import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
 import com.example.emailManagementApp.exceptions.EmailManagementAppException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
+import com.example.emailManagementApp.models.Notification;
 import com.example.emailManagementApp.models.User;
 import com.example.emailManagementApp.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -45,9 +46,9 @@ class UserServiceImplTest {
         UserRequest userRequest = new UserRequest();
         userRequest.setEmail("newemail@gmail.com");
         userRequest.setPassword("password");
-        mailBoxesService.createMailBoxes("newemail@gmail.com");
+//        mailBoxesService.createMailBoxes("newemail@gmail.com");
         userService.createUser("newemail@gmail.com","password");
-
+        mailBoxesService.createMailBoxes("newemail@gmail.com");
         UserRequest userRequest1= new UserRequest();
         userRequest1.setEmail("newemail@gmail.com");
         userRequest1.setPassword("password");
@@ -102,7 +103,19 @@ class UserServiceImplTest {
 
         assertThrows(UserDidNotLogInException.class,()-> userService.userCreatedCanLogIn(request));
     }
+    @Test
+    public void testThatUserCanCheckNotificationWhenTheyLogIn(){
+        //given
+        User user = new User();
+        user.setEmail("newemail@gmail.com");
+        user.setPassword("password");
+        user.setLogInStatus(true);
+        userService.createUser("newemail@gmail.com","password");
 
+        Notification checkNotification = new Notification();
+        checkNotification.setTitle("new message alert");
+        checkNotification.setSentMessage();
 
+    }
 
 }

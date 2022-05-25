@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
            foundUser.setLogInStatus(true);
             userRepository.save(foundUser);
 
-            System.out.println(foundUser);
+//            System.out.println(foundUser);
             UserResponseLogIn userResponseLogIn = new UserResponseLogIn();
             userResponseLogIn.setPassword(request.getPassword());
             userResponseLogIn.setUsername(request.getEmail());
@@ -74,4 +74,5 @@ public class UserServiceImpl implements UserService {
         }
 
     }
+
 }

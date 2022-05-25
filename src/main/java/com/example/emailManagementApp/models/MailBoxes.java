@@ -17,4 +17,5 @@ public class MailBoxes {
     @Id
     private String userName;
     List<MailBox> mailBox = new ArrayList<>();
+
 }
