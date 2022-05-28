@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.validation.annotation.Validated;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -19,7 +20,7 @@ public class User {
     @Id
     private String email;
     private String password;
-    private List<Notification> notificationlist;
+    private List<Notification> notificationlist=new ArrayList<>();
     private boolean isLogInStatus = false;
 
 

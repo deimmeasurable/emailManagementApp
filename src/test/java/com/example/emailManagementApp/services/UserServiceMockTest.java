@@ -59,10 +59,7 @@ public class UserServiceMockTest {
 
         User mockUser = new User("newemail@gmail.com", "password",new java.util.ArrayList<>(),false);
         User mockUser1 = new User("newemail@gmail.com","password",new java.util.ArrayList<>(),false);
-        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenReturn(mockUser);
-        when(userRepository.save(any(User.class))).thenReturn(mockUser1);
-
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(mockUser));
 
         assertThrows(EmailManagementAppException.class,()->userService.createUser("newemail@gmail.com","password"));
     }

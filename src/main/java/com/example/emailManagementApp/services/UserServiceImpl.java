@@ -2,11 +2,14 @@ package com.example.emailManagementApp.services;
 
 
 import com.example.emailManagementApp.dtos.request.UserRequestLogInDto;
+import com.example.emailManagementApp.dtos.response.NotificationCheckedResponse;
 import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
 import com.example.emailManagementApp.exceptions.EmailManagementAppException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
+import com.example.emailManagementApp.exceptions.UserDidNotLogInNotificationException;
 import com.example.emailManagementApp.exceptions.UserDoesNotExistException;
+import com.example.emailManagementApp.models.Notification;
 import com.example.emailManagementApp.models.User;
 import com.example.emailManagementApp.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -71,6 +74,39 @@ public class UserServiceImpl implements UserService {
             return userResponseLogIn;
         } else {
             throw new UserDidNotLogInException("user didn't login");
+        }
+
+    }
+
+    @Override
+    public UserRepository getRepository() {
+    return userRepository;
+    }
+
+    @Override
+    public NotificationCheckedResponse userCheckNotificationWhenTheyLoggedIn(Notification checkNotification) {
+        User foundUser = userRepository.findUserByEmail(checkNotification.getId()).orElseThrow(()->new UserDoesNotExistException("user don't exist"));
+        if(!foundUser.isLogInStatus()){
+            foundUser.setLogInStatus(true);
+
+            Notification notification = new Notification();
+            notification.setReadMessage(true);
+            notification.setSentMessage(checkNotification.getSentMessage());
+            notification.setTitle(checkNotification.getTitle());
+
+            foundUser.getNotificationlist().remove(notification);
+            System.out.println(foundUser);
+
+            NotificationCheckedResponse notificationUpdate = new NotificationCheckedResponse();
+            notificationUpdate.setNotificationRead(true);
+            notificationUpdate.setDate(notificationUpdate.getDate());
+            notificationUpdate.setUserName(checkNotification.getId());
+            notificationUpdate.setMessageReceived(checkNotification.getSentMessage());
+
+            return notificationUpdate;
+
+        }else{
+            throw new UserDidNotLogInNotificationException("user didn't login, so can't check notification");
         }
 
     }

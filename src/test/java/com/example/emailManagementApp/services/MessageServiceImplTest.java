@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import static com.example.emailManagementApp.models.MailboxType.INBOX;
+import static com.example.emailManagementApp.models.MailboxType.SENT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.StatusResultMatchersExtensionsKt.isEqualTo;
@@ -45,7 +46,7 @@ class MessageServiceImplTest {
         userRequest.setEmail("newemail@gmail.com");
         userRequest.setPassword("password");
         mailBoxesService.createMailBoxes("newemail@gmail.com");
-        UserDto userDto = userService.createUser("newemail@gmail.com", "password");
+        userService.createUser("newemail@gmail.com", "password");
 
         MessageRequest messageRequest = new MessageRequest();
         messageRequest.setUserName("newemail@gmail.com");
@@ -81,7 +82,53 @@ class MessageServiceImplTest {
 
 
       assertEquals(messageRequest.getReceiver(),"newemail@gmail.com");
-//      assertEquals(messageRequest.getMessageBody(),"")
+      assertEquals(messageRequest.getMessageBody(),"Welcome newUser to gmail.com, we are pls to have you");
+    }
+    @Test
+    public void testThatOneUserCanSendMessageToAnotherUser(){
+//        UserRequest userRequest = new UserRequest();
+//        userRequest.setEmail("newemail@gmail.com");
+//        userRequest.setPassword("password");
+        mailBoxesService.createMailBoxes("newemail@gmail.com");
+        userService.createUser("newemail@gmail.com", "password");
+        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+        userService.createUser("seconduser@gmail.com", "phantom45");
+
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setUserName("newemail@gmail.com");
+        messageRequest.setReceiver("seconduser@gmail.com");
+        messageRequest.setSender("newemail@gmail.com");
+        messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
+        messageRequest.setDate( LocalDateTime.now());
+
+        messageService.sendMessageToNewUser(messageRequest);
+        MailBoxes mailBoxes = new MailBoxes();
+        mailBoxes.setUserName("newemail@gmail.com");
+        mailBoxes.setMailBox(mailBoxes.getMailBox());
+
+
+        MailBox mailBox = new MailBox();
+        mailBox.setMailboxType(SENT);
+        mailBox.setUserName("newemail@gmail.com");
+        mailBoxes.getMailBox().add(mailBox);
+
+
+        MailBox mailBoxUser2 = new MailBox();
+        mailBoxUser2.setMailboxType(INBOX);
+        mailBoxUser2.setUserName("seconduser@gmail.com");
+        mailBoxes.getMailBox().add(mailBoxUser2);
+
+
+        Notification sendNotification = new Notification();
+        sendNotification.setId("newemail@gmail.com");
+        sendNotification.setSentMessage("It was nice finally meeting you today, hope you will attend the conference");
+        sendNotification.setTitle("welcome new user");
+
+
+        User user = new User();
+        user.setLogInStatus(true);
+        user.setNotificationlist(user.getNotificationlist());
+
     }
 
 
