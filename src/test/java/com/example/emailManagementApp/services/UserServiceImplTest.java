@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -73,7 +73,7 @@ class UserServiceImplTest {
         User user = new User();
         user.setEmail("newemail@gmail.com");
         user.setPassword("password");
-        user.setLogInStatus(true);
+
         userService.createUser("newemail@gmail.com","password");
         mailBoxesService.createMailBoxes("newemail@gmail.com");
 

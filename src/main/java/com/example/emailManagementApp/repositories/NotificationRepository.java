@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotificationRepository  extends MongoRepository<Notification,String> {
-Notification findNotificationByUserName(String userName);
+Notification findNotificationByReceiver(String userName);
 }

@@ -16,6 +16,7 @@ public class Message {
     private String receiver;
     private String messageBody;
     private LocalDateTime date;
+    private String messageTitle;
     @Id
     private String userName;
 }

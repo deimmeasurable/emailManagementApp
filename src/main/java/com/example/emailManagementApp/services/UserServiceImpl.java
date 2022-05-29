@@ -61,11 +61,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseLogIn userCreatedCanLogIn(UserRequestLogInDto request) {
         User foundUser = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+
+        if(!foundUser.getPassword().equals(request.getPassword())){
+            throw new UserDoesNotExistException("user password is incorrect");
+        }
+
         if (!foundUser.isLogInStatus()) {
            foundUser.setLogInStatus(true);
             userRepository.save(foundUser);
 
-//            System.out.println(foundUser);
+               System.out.println(foundUser.getPassword());
             UserResponseLogIn userResponseLogIn = new UserResponseLogIn();
             userResponseLogIn.setPassword(request.getPassword());
             userResponseLogIn.setUsername(request.getEmail());

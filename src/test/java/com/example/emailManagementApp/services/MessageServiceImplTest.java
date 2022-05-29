@@ -5,6 +5,7 @@ import com.example.emailManagementApp.dtos.request.MailBoxesMessageRequestDto;
 import com.example.emailManagementApp.dtos.request.MessageRequest;
 import com.example.emailManagementApp.dtos.request.UserRequest;
 import com.example.emailManagementApp.dtos.response.MailBoxesDto;
+import com.example.emailManagementApp.dtos.response.SentMessageResponseDto;
 import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.models.MailBox;
 import com.example.emailManagementApp.models.MailBoxes;
@@ -99,9 +100,10 @@ class MessageServiceImplTest {
         messageRequest.setReceiver("seconduser@gmail.com");
         messageRequest.setSender("newemail@gmail.com");
         messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
+        messageRequest.setMessageTitle("Invitation to attend conference");
         messageRequest.setDate( LocalDateTime.now());
 
-        messageService.sendMessageToNewUser(messageRequest);
+//        messageService.sendMessageToNewUser(messageRequest);
         MailBoxes mailBoxes = new MailBoxes();
         mailBoxes.setUserName("newemail@gmail.com");
         mailBoxes.setMailBox(mailBoxes.getMailBox());
@@ -119,15 +121,19 @@ class MessageServiceImplTest {
         mailBoxes.getMailBox().add(mailBoxUser2);
 
 
+     SentMessageResponseDto response= messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+
         Notification sendNotification = new Notification();
         sendNotification.setId("newemail@gmail.com");
         sendNotification.setSentMessage("It was nice finally meeting you today, hope you will attend the conference");
-        sendNotification.setTitle("welcome new user");
+        sendNotification.setTitle("Invitation to attend conference");
 
 
-        User user = new User();
-        user.setLogInStatus(true);
-        user.setNotificationlist(user.getNotificationlist());
+        assertEquals(response.getSender(),"newemail@gmail.com");
+        assertEquals(response.getMessageBody(),"It was nice finally meeting you today, hope you will attend the conference");
+
+
+
 
     }
 

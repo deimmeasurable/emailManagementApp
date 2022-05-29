@@ -15,6 +15,7 @@ public class MessageRequest {
     private String sender;
     private String messageBody;
     private LocalDateTime date;
+    private String messageTitle;
 
     @Id
     private String userName;
