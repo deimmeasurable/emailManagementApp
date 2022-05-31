@@ -26,8 +26,8 @@ private ModelMapper modelmapper=new ModelMapper();
 
 
     @Override
-    public NotificationResponseDto createNotification(Notification sendNotification, MessageRequest messageRequest) {
-        User recipient = userRepository.findUserByEmail(sendNotification.getReceiver()).orElseThrow(()->new UserDoesNotExistException("user don't exist"));
+    public NotificationResponseDto createNotification( MessageRequest messageRequest) {
+        User recipient = userRepository.findUserByEmail(messageRequest.getReceiver()).orElseThrow(()->new UserDoesNotExistException("user don't exist"));
 
 
         Message sendMessage = new Message();
@@ -38,21 +38,26 @@ private ModelMapper modelmapper=new ModelMapper();
         sendMessage.setDate(messageRequest.getDate());
 
         Notification notification = new Notification();
-        notification.setTitle(sendNotification.getTitle());
-        notification.setSentMessage(sendNotification.getSentMessage());
-        notification.setReadMessage(sendNotification.isReadMessage());
-        notification.setReceiver(sendNotification.getReceiver());
+        notification.setTitle(messageRequest.getMessageTitle());
+        notification.setSentMessage(messageRequest.getMessageBody());
+        notification.setReadMessage(notification.isReadMessage());
+        notification.setReceiver(messageRequest.getReceiver());
 
       notificationRepository.save(notification);
 
       recipient.getNotificationlist().add(notification);
 
-//      NotificationResponseDto notificationResponseDto = new NotificationResponseDto();
+      NotificationResponseDto notificationResponseDto = new NotificationResponseDto();
+      notificationResponseDto.setReadMessage(notificationResponseDto.isReadMessage());
+      notificationResponseDto.setReceiver(messageRequest.getReceiver());
+      notificationResponseDto.setTitle(messageRequest.getMessageTitle());
+      notificationResponseDto.setSender(messageRequest.getSender());
+      notificationResponseDto.setSentMessage(messageRequest.getMessageBody());
 
 
 
 
 
-        return modelmapper.map(recipient,NotificationResponseDto.class) ;
+        return notificationResponseDto;
     }
 }

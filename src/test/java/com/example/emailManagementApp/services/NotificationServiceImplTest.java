@@ -55,7 +55,7 @@ class NotificationServiceImplTest {
                 .title("new message alert")
                 .build();
 
-        NotificationResponseDto response = notificationService.createNotification(sendNotification,messageRequest);
+        NotificationResponseDto response = notificationService.createNotification(messageRequest);
 
         assertEquals(response.getReceiver(),"newemail@gmail.com");
     }

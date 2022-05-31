@@ -7,6 +7,6 @@ import com.example.emailManagementApp.models.Notification;
 
 public interface NotificationService {
 
-      NotificationResponseDto createNotification(Notification sendNotification, MessageRequest messageRequest);
+      NotificationResponseDto createNotification( MessageRequest messageRequest);
 
 }
