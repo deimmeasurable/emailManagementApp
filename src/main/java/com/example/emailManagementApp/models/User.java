@@ -2,6 +2,7 @@ package com.example.emailManagementApp.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.validation.annotation.Validated;
 
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Builder
 @Validated
 @ToString
+@Document
 public class User {
     @Id
     private String email;

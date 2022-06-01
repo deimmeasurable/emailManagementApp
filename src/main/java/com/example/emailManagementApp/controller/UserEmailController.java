@@ -6,17 +6,13 @@ import com.example.emailManagementApp.exceptions.EmailManagementAppException;
 import com.example.emailManagementApp.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
 @RequestMapping("api/v1/emailApp")
 public class UserEmailController {
-    private UserService userService;
+    private final UserService userService;
 
 
     public UserEmailController(UserService userService) {
@@ -43,4 +39,5 @@ public class UserEmailController {
             return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
         }
     }
+//    @GetMapping("/login")
 }

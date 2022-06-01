@@ -133,9 +133,14 @@ class MessageServiceImplTest {
 
     }
     @Test
-    public void testThatUserCanFindAMessageInsideListOfMessage(){
+    public void testThatUserCanFindAMessageInsideListOfMessageInInBox(){
 
-        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+
+
+
+        mailBoxesService.createMailBoxes("newemail@gmail.com");
+        userService.createUser("newemail@gmail.com", "password");
+       mailBoxesService.createMailBoxes("seconduser@gmail.com");
         userService.createUser("seconduser@gmail.com", "phantom45");
 
 
@@ -153,11 +158,47 @@ class MessageServiceImplTest {
         messageRequest.setDate(LocalDateTime.now());
         messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
 
-        List<Message> foundMessage= messageService.userCanFindAMessageInListOfMessageInsideInbox(messageRequest);
+        Message foundMessage= messageService.userCanFindAMessageInListOfMessageInsideInbox(messageRequest);
 
-//        assertArrayEquals(foundMessage.stream().toArray());
-        assertEquals(foundMessage.size(),1);
+       assertEquals(foundMessage.getMessageTitle(),"Invitation to attend conference");
+       assertEquals(foundMessage.getMessageBody(),"It was nice finally meeting you today, hope you will attend the conference");
+
     }
+    @Test
+    public void testThatUserCanFindAMessageInsideListOfMessageInOutBox(){
+        mailBoxesService.createMailBoxes("newemail@gmail.com");
+        userService.createUser("newemail@gmail.com", "password");
+        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+        userService.createUser("seconduser@gmail.com", "phantom45");
+
+        MailBoxes mailBoxes = new MailBoxes();
+        mailBoxes.setMailBox(new ArrayList<>());
+        mailBoxes.setUserName("newemail@gmail.com");
+
+
+
+        MailBox mailBoxUser = new MailBox();
+        mailBoxUser.setMailboxType(SENT);
+        mailBoxUser.setUserName("newemail@gmail.com");
+        mailBoxes.getMailBox().add(mailBoxUser);
+
+
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setUserName("newemail@gmail.com");
+        messageRequest.setReceiver("seconduser@gmail.com");
+        messageRequest.setSender("newemail@gmail.com");
+        messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
+        messageRequest.setMessageTitle("Invitation to attend conference");
+        messageRequest.setDate(LocalDateTime.now());
+//        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+
+        Message foundMessage= messageService.userCanFindAMessageInListOfMessageInsideInOutBox(messageRequest);
+
+        assertEquals(foundMessage.getMessageTitle(),"Invitation to attend conference");
+        assertEquals(foundMessage.getMessageBody(),"It was nice finally meeting you today, hope you will attend the conference");
+
+    }
+
 
 
 }

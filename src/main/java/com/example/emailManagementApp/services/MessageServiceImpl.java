@@ -8,34 +8,42 @@ import com.example.emailManagementApp.exceptions.MessageNotFoundException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
 import com.example.emailManagementApp.exceptions.UserDoesNotExistException;
 import com.example.emailManagementApp.models.*;
+import com.example.emailManagementApp.repositories.MailBoxRepository;
 import com.example.emailManagementApp.repositories.MessageRepository;
 import com.example.emailManagementApp.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
-public class MessageServiceImpl  implements MessageService{
-//    @Autowired
+public class MessageServiceImpl  implements MessageService {
+    //    @Autowired
     private final MessageRepository messageRepository;
 
-//    @Autowired
-   private UserRepository userRepository;
+    //    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private MailBoxRepository mailBoxRepository;
+
+    //   @Autowired
+    private MailBoxesService mailBoxesService;
 
 
-
-
-    public MessageServiceImpl(UserRepository userRepository, MessageRepository messageRepository){
+    public MessageServiceImpl(UserRepository userRepository, MessageRepository messageRepository, MailBoxesService mailBoxesService) {
         this.userRepository = userRepository;
         this.messageRepository = messageRepository;
+        this.mailBoxesService = mailBoxesService;
     }
 
 
     @Override
     public Message sendMessageToNewUser(MessageRequest messageRequest) {
 
-        User  recipient = userRepository.findUserByEmail(messageRequest.getUserName()).orElseThrow (()->new UserDoesNotExistException("user is not found"));
+        User recipient = userRepository.findUserByEmail(messageRequest.getUserName()).orElseThrow(() -> new UserDoesNotExistException("user is not found"));
 
         Message message = Message.builder()
                 .sender(messageRequest.getSender())
@@ -57,17 +65,13 @@ public class MessageServiceImpl  implements MessageService{
         mailBoxes.getMailBox().add(mailBox);
 
 
-
-
-        Notification sendNotification =  Notification.builder()
-                        .sender(messageRequest.getSender())
-                                .id(message.getUserName())
+        Notification sendNotification = Notification.builder()
+                .sender(messageRequest.getSender())
+                .id(message.getUserName())
                 .sentMessage(messageRequest.getMessageBody())
-                                        .title("new message alert")
-                                                .build();
-                recipient.getNotificationlist().add(sendNotification);
-
-
+                .title("new message alert")
+                .build();
+        recipient.getNotificationlist().add(sendNotification);
 
 
         userRepository.save(recipient);
@@ -78,10 +82,10 @@ public class MessageServiceImpl  implements MessageService{
     }
 
     public SentMessageResponseDto messageCanBeSendFromOneUserToAnotherUser(MessageRequest messageRequest) {
-        User senderUser = userRepository.findUserByEmail(messageRequest.getSender()).orElseThrow(()->new UserDoesNotExistException("user is not found"));
-        User receiverUser = userRepository.findUserByEmail(messageRequest.getReceiver()).orElseThrow(()->new UserDoesNotExistException("user is not found"));
+        User senderUser = userRepository.findUserByEmail(messageRequest.getUserName()).orElseThrow(() -> new UserDoesNotExistException("user is not found"));
+        User receiverUser = userRepository.findUserByEmail(messageRequest.getReceiver()).orElseThrow(() -> new UserDoesNotExistException("user is not found"));
 
-        if(!senderUser.isLogInStatus()){
+        if (!senderUser.isLogInStatus()) {
             senderUser.setLogInStatus(true);
 
             Message message = new Message();
@@ -98,7 +102,6 @@ public class MessageServiceImpl  implements MessageService{
             mailBoxes.setMailBox(mailBoxes.getMailBox());
 
 
-
             MailBox mailBoxSender = new MailBox();
             mailBoxSender.setMailboxType(MailboxType.SENT);
             mailBoxSender.setUserName(messageRequest.getUserName());
@@ -107,9 +110,6 @@ public class MessageServiceImpl  implements MessageService{
 
             System.out.println(receiverUser);
             System.out.println(mailBoxes);
-
-
-
 
 
             MailBox mailBoxReceiver = new MailBox();
@@ -142,35 +142,57 @@ public class MessageServiceImpl  implements MessageService{
     }
 
     @Override
-    public List<Message> userCanFindAMessageInListOfMessageInsideInbox(MessageRequest messageRequest) {
-        User foundUser = userRepository.findUserByEmail(messageRequest.getReceiver()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+    public Message userCanFindAMessageInListOfMessageInsideInbox(MessageRequest messageRequest) {
+        User foundUser = userRepository.findUserByEmail(messageRequest.getUserName()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+
+
+        if (!foundUser.isLogInStatus()) {
+           foundUser.setLogInStatus(true);
+
+            MailBoxes mailBoxes = mailBoxesService.findMailBoxesByUserName(foundUser.getEmail());
+            MailBox box = null;
+            for (MailBox mailBox : mailBoxes.getMailBox()) {
+                if (mailBox.getMailboxType().equals(MailboxType.INBOX)) {
+                    box = mailBox;
+                }
+            }
+
+            for (Message msg : Objects.requireNonNull(box).getMessage()) {
+                if (msg.getMessageBody().equals(messageRequest.getMessageBody()) || msg.getMessageTitle().equals(messageRequest.getMessageTitle())) {
+                    return msg;
+
+
+                }
+            }
+        }
+        throw new UserDidNotLogInException("user didn't login");
+    }
+
+    @Override
+    public Message userCanFindAMessageInListOfMessageInsideInOutBox(MessageRequest messageRequest) {
+        User foundUser = userRepository.findUserByEmail(messageRequest.getSender()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+//        MailBoxes mailBoxes = mailBoxesService.findMailBoxesByUserName(foundUser.getEmail());
 
         if (!foundUser.isLogInStatus()) {
             foundUser.setLogInStatus(true);
 
-
-            MailBoxes mailBoxes = new MailBoxes();
-            mailBoxes.setMailBox(mailBoxes.getMailBox());
-            mailBoxes.setUserName(messageRequest.getReceiver());
-
-
-            MailBox mailBox = new MailBox();
-            mailBox.setUserName(messageRequest.getReceiver());
-            mailBox.setMailboxType(MailboxType.INBOX);
-            mailBoxes.getMailBox().add(mailBox);
-
-
-            Message foundMessage = messageRepository.findMessageByUserName(messageRequest.getMessageTitle());
-            if (foundMessage == null) {
-                throw new MessageNotFoundException("message don't exit");
+           MailBoxes mailBoxes = mailBoxesService.findMailBoxesByUserName(foundUser.getEmail());
+            MailBox box = null;
+            for (MailBox mailBox : mailBoxes.getMailBox()) {
+                if (mailBox.getMailboxType().equals(MailboxType.SENT)) {
+                    box = mailBox;
+                }
             }
 
-            List<Message> message = new ArrayList<>();
-            message.add(foundMessage);
+            for (Message msg : Objects.requireNonNull(box).getMessage()) {
+                if (msg.getMessageBody().equals(messageRequest.getMessageBody()) || msg.getMessageTitle().equals(messageRequest.getMessageTitle())) {
+                    return msg;
 
 
-            return message;
+                }
+            }
         }
-        throw new UserDidNotLogInException("user didn't login exception");
+        throw new UserDidNotLogInException("user didn't login");
+
     }
 }

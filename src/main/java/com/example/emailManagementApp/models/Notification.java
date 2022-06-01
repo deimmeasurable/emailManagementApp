@@ -2,6 +2,7 @@ package com.example.emailManagementApp.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
@@ -9,6 +10,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @Builder
 @ToString
+@Document
 public class Notification {
     private String title;
     private boolean isReadMessage;

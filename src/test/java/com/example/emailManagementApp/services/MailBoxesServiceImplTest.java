@@ -1,6 +1,7 @@
 package com.example.emailManagementApp.services;
 
 import com.example.emailManagementApp.dtos.request.MailBoxesRequest;
+import com.example.emailManagementApp.dtos.request.MessageRequest;
 import com.example.emailManagementApp.dtos.response.MailBoxesDto;
 import com.example.emailManagementApp.models.MailBox;
 
@@ -11,8 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
+import static com.example.emailManagementApp.models.MailboxType.INBOX;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -23,6 +27,12 @@ class MailBoxesServiceImplTest {
 
 @Autowired
     MailBoxesRepository MailBoxesRepository;
+
+@Autowired
+private UserService userService;
+
+@Autowired
+private MessageService messageService;
 
 
 @Test
@@ -52,5 +62,27 @@ public void testThatMailBoxesCanBeCreated(){
 
 
 }
+    @Test
+    public void testThatUserCanViewInbox(){
+        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+        userService.createUser("seconduser@gmail.com", "phantom45");
+
+
+        MailBox mailBoxUser = new MailBox();
+        mailBoxUser.setMailboxType(INBOX);
+        mailBoxUser.setUserName("seconduser@gmail.com");
+
+
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setUserName("newemail@gmail.com");
+        messageRequest.setReceiver("seconduser@gmail.com");
+        messageRequest.setSender("newemail@gmail.com");
+        messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
+        messageRequest.setMessageTitle("Invitation to attend conference");
+        messageRequest.setDate(LocalDateTime.now());
+       messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+
+       List<MailBox> mailBox= mailBoxesService.userCanViewAllInbox(messageRequest);
+    }
 
 }
