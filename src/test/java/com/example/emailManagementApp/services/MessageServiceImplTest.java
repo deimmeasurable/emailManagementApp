@@ -1,12 +1,12 @@
 package com.example.emailManagementApp.services;
 
 
+import com.example.emailManagementApp.dtos.request.ForwardMessageRequest;
+import com.example.emailManagementApp.dtos.response.ForwardMessageResponse;
 import com.example.emailManagementApp.dtos.request.MailBoxesMessageRequestDto;
 import com.example.emailManagementApp.dtos.request.MessageRequest;
 import com.example.emailManagementApp.dtos.request.UserRequest;
-import com.example.emailManagementApp.dtos.response.MailBoxesDto;
 import com.example.emailManagementApp.dtos.response.SentMessageResponseDto;
-import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.models.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.example.emailManagementApp.models.MailboxType.INBOX;
@@ -136,8 +135,6 @@ class MessageServiceImplTest {
     public void testThatUserCanFindAMessageInsideListOfMessageInInBox(){
 
 
-
-
         mailBoxesService.createMailBoxes("newemail@gmail.com");
         userService.createUser("newemail@gmail.com", "password");
        mailBoxesService.createMailBoxes("seconduser@gmail.com");
@@ -158,17 +155,27 @@ class MessageServiceImplTest {
         messageRequest.setDate(LocalDateTime.now());
         messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
 
-        Message foundMessage= messageService.userCanFindAMessageInListOfMessageInsideInbox(messageRequest);
 
-       assertEquals(foundMessage.getMessageTitle(),"Invitation to attend conference");
+        Message foundMessage = messageService.userCanFindAMessageInListOfMessageInsideInbox(messageRequest);
+
+        assertEquals(foundMessage.getMessageTitle(),"Invitation to attend conference");
        assertEquals(foundMessage.getMessageBody(),"It was nice finally meeting you today, hope you will attend the conference");
 
     }
     @Test
     public void testThatUserCanFindAMessageInsideListOfMessageInOutBox(){
+        User user = new User();
+        user.setEmail("newemail@gmail.com");
+        user.setPassword("password");
+        user.setLogInStatus(true);
         mailBoxesService.createMailBoxes("newemail@gmail.com");
         userService.createUser("newemail@gmail.com", "password");
-        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+
+        User user2 = new User();
+        user2.setEmail("seconduser@gmail.com");
+        user2.setPassword("phantom45");
+//        user2.setLogInStatus(true);
+       mailBoxesService.createMailBoxes("seconduser@gmail.com");
         userService.createUser("seconduser@gmail.com", "phantom45");
 
         MailBoxes mailBoxes = new MailBoxes();
@@ -190,12 +197,51 @@ class MessageServiceImplTest {
         messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
         messageRequest.setMessageTitle("Invitation to attend conference");
         messageRequest.setDate(LocalDateTime.now());
-//        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
 
         Message foundMessage= messageService.userCanFindAMessageInListOfMessageInsideInOutBox(messageRequest);
 
         assertEquals(foundMessage.getMessageTitle(),"Invitation to attend conference");
         assertEquals(foundMessage.getMessageBody(),"It was nice finally meeting you today, hope you will attend the conference");
+
+    }
+    @Test
+    public void testThatReceivedMessageCanBeForwardedToAnotherUser(){
+        User user = new User();
+        user.setPassword("phantom45");
+        user.setEmail("seconduser@gmail.com");
+        user.setLogInStatus(true);
+        mailBoxesService.createMailBoxes("seconduser@gmail.com");
+        userService.createUser("seconduser@gmail.com", "phantom45");
+
+
+        User user2 = new User();
+        user2.setEmail("thirduser@gmail.com");
+        user2.setPassword("house123");
+        mailBoxesService.createMailBoxes("thirduser@gmail.com");
+        userService.createUser("thirduser@gmail.com", "house123");
+
+        MailBox mailBoxUser2 = new MailBox();
+        mailBoxUser2.setMailboxType(INBOX);
+        mailBoxUser2.setUserName("seconduser@gmail.com");
+
+
+        MessageRequest messageRequest = new MessageRequest();
+        messageRequest.setUserName("newemail@gmail.com");
+        messageRequest.setReceiver("seconduser@gmail.com");
+        messageRequest.setSender("newemail@gmail.com");
+        messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
+        messageRequest.setMessageTitle("Invitation to attend conference");
+        messageRequest.setDate(LocalDateTime.now());
+        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+
+        ForwardMessageRequest forwardMessageRequest = new ForwardMessageRequest();
+        forwardMessageRequest.setUserForwardMessage("seconduser@gmail.com");
+        forwardMessageRequest.setReceiverForwardMessage("thirduser@gmail.com");
+        forwardMessageRequest.setForwardMessageBody(String.valueOf(messageRequest));
+
+        List<User> foundUser = messageService.receivedMessageCanBeForwardedToAnotherUser(messageRequest);
+
 
     }
 

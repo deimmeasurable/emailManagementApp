@@ -10,10 +10,12 @@ import com.example.emailManagementApp.repositories.UserRepository;
 
 public interface UserService {
     UserDto createUser(String email, String password);
-    UserResponseLogIn userCreatedCanLogIn(UserRequestLogInDto request);
-
+    UserResponseLogIn userCreatedCanLogIn(String email, String password);
 
     UserRepository getRepository();
 
     NotificationCheckedResponse userCheckNotificationWhenTheyLoggedIn(Notification checkNotification);
+
+
+
 }

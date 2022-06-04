@@ -80,7 +80,7 @@ class UserServiceImplTest {
         UserRequestLogInDto request = new UserRequestLogInDto();
         request.setEmail("newemail@gmail.com");
         request.setPassword("password");
-          userService.userCreatedCanLogIn(request);
+          userService.userCreatedCanLogIn("newemail@gmail.com","password");
 
           UserResponseLogIn userResponseLogIn = new UserResponseLogIn();
           userResponseLogIn.setUsername("newemail@gmail.com");
@@ -107,9 +107,9 @@ class UserServiceImplTest {
         UserRequestLogInDto request = new UserRequestLogInDto();
         request.setEmail("newemail@gmail.com");
         request.setPassword("password");
-        userService.userCreatedCanLogIn(request);
+        userService.userCreatedCanLogIn("newemail@gmail.com","password");
 
-        assertThrows(UserDidNotLogInException.class,()-> userService.userCreatedCanLogIn(request));
+        assertThrows(UserDidNotLogInException.class,()-> userService.userCreatedCanLogIn("newemail@gmail.com","password"));
     }
     @Test
     public void testThatMoreThanOneUserCanBeCreated(){
@@ -168,7 +168,7 @@ class UserServiceImplTest {
         User user = new User();
         user.setEmail("newemail@gmail.com");
         user.setPassword("password");
-//        user.setLogInStatus(true);
+        user.setLogInStatus(user.isLogInStatus());
         userService.createUser("newemail@gmail.com","password");
 
         Notification checkNotification = new Notification();

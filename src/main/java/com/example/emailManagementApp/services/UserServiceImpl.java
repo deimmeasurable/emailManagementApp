@@ -15,6 +15,7 @@ import com.example.emailManagementApp.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.Optional;
 @NoArgsConstructor
 @AllArgsConstructor
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
@@ -59,22 +61,23 @@ public class UserServiceImpl implements UserService {
         }
     }
     @Override
-    public UserResponseLogIn userCreatedCanLogIn(UserRequestLogInDto request) {
-        User foundUser = userRepository.findUserByEmail(request.getEmail()).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+    public UserResponseLogIn userCreatedCanLogIn(String email, String password) {
+        User foundUser = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
 
-        if(!foundUser.getPassword().equals(request.getPassword())){
+        if(!foundUser.getPassword().equals(password)){
             throw new UserDoesNotExistException("user password is incorrect");
         }
 
         if (!foundUser.isLogInStatus()) {
+            log.info("login status-->{}", foundUser.isLogInStatus());
            foundUser.setLogInStatus(true);
             userRepository.save(foundUser);
 
                System.out.println(foundUser.getPassword());
             UserResponseLogIn userResponseLogIn = new UserResponseLogIn();
-            userResponseLogIn.setPassword(request.getPassword());
-            userResponseLogIn.setUsername(request.getEmail());
-            userResponseLogIn.setLogInSuccessMessage(request.getEmail() + "," + request.getMessage());
+            userResponseLogIn.setPassword(password);
+            userResponseLogIn.setUsername(email);
+            userResponseLogIn.setLogInSuccessMessage(email + ", user login" );
 
             return userResponseLogIn;
         } else {
@@ -92,6 +95,7 @@ public class UserServiceImpl implements UserService {
     public NotificationCheckedResponse userCheckNotificationWhenTheyLoggedIn(Notification checkNotification) {
         User foundUser = userRepository.findUserByEmail(checkNotification.getId()).orElseThrow(()->new UserDoesNotExistException("user don't exist"));
         if(!foundUser.isLogInStatus()){
+            log.info("-->{}", foundUser.isLogInStatus());
             foundUser.setLogInStatus(true);
 
             Notification notification = new Notification();

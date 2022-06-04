@@ -24,6 +24,4 @@ public class User {
     private String password;
     private List<Notification> notificationlist=new ArrayList<>();
     private boolean isLogInStatus = false;
-
-
 }

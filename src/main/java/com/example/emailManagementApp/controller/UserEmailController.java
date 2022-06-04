@@ -1,8 +1,11 @@
 package com.example.emailManagementApp.controller;
 
+import com.example.emailManagementApp.dtos.request.UserRequestLogInDto;
 import com.example.emailManagementApp.dtos.response.ApiResponse;
 import com.example.emailManagementApp.dtos.response.UserDto;
+import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
 import com.example.emailManagementApp.exceptions.EmailManagementAppException;
+import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
 import com.example.emailManagementApp.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,5 +42,27 @@ public class UserEmailController {
             return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
         }
     }
-//    @GetMapping("/login")
+    @GetMapping("/login/{email}/{password}")
+   public ResponseEntity<?> userCreatedCanLogIn(@PathVariable String email, @PathVariable String password){
+        try {
+            UserResponseLogIn userResponseLogIn= userService.userCreatedCanLogIn(email,password);
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .payload(userResponseLogIn)
+                    .isSuccessful(true)
+                    .statusCode(201)
+                    .message("user login successfully")
+                    .build();
+            return new ResponseEntity<>(apiResponse,HttpStatus.OK);
+
+
+        }catch(UserDidNotLogInException e){
+            ApiResponse apiResponse = ApiResponse.builder()
+                    .message(e.getMessage())
+                    .isSuccessful(false)
+                    .statusCode(400)
+                    .build();
+            return new ResponseEntity<>(apiResponse,HttpStatus.BAD_REQUEST);
+        }
+
+    }
 }
