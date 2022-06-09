@@ -93,6 +93,6 @@ public class MailBoxesServiceImpl implements MailBoxesService{
               .parallel()
               .filter(mailBox -> mailBox.getMailboxType()== MailboxType.INBOX).collect(Collectors.toList());
         }
-        throw new UserDidNotLogInException("user didn't login");
+        throw new UserDidNotLogInException("mail");
     }
 }

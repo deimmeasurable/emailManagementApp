@@ -1,8 +1,11 @@
 package com.example.emailManagementApp.services;
 
+import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
 import com.example.emailManagementApp.exceptions.EmailManagementAppException;
+import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
 import com.example.emailManagementApp.models.User;
 import com.example.emailManagementApp.repositories.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +16,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 
@@ -22,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;import static org.mo
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.StatusResultMatchersExtensionsKt.isEqualTo;
-
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 public class UserServiceMockTest {
     @Mock
@@ -45,7 +49,7 @@ public class UserServiceMockTest {
         String email= "newemail@gmail.com";
         String password= "password";
 
-        User mockUser = new User("newemail@gmail.com", "password",new java.util.ArrayList<>(),false);
+        User mockUser = new User("newemail@gmail.com", "password",new ArrayList<>(),false);
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
        var result = userService.createUser(email,password);
@@ -57,12 +61,37 @@ public class UserServiceMockTest {
     @Test
     void testThatUserWithSameEmailCannotRegister(){
 
-        User mockUser = new User("newemail@gmail.com", "password",new java.util.ArrayList<>(),false);
-        User mockUser1 = new User("newemail@gmail.com","password",new java.util.ArrayList<>(),false);
+        User mockUser = new User("newemail@gmail.com", "password",new ArrayList<>(),false);
+        User mockUser1 = new User("newemail@gmail.com","password",new ArrayList<>(),false);
         when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(mockUser));
 
         assertThrows(EmailManagementAppException.class,()->userService.createUser("newemail@gmail.com","password"));
     }
-    @AfterEach
-    void tearDown() {userService=null;}
+    @Test
+    void testThatRegisterUserCanLogIn() {
+        String email = "newemail@gmail.com";
+        String password = "password";
+        User mockUser = new User("newemail@gmail.com","password",new ArrayList<>(),false);
+
+        when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(mockUser));
+
+        var result = userService.userCreatedCanLogIn(email,password);
+        log.info("check the result-->",result);
+
+        assertEquals(result.getUsername(),email);
+        assertEquals(result.getPassword(),password);
+    }
+    @Test
+    void testThatExceptionIfUserDidNotLogin() {
+        String email = "newemail@gmail.com";
+        String password = "password";
+        User mockUser = new User("newemail@gmail.com","password",new ArrayList<>(),false);
+
+       when(userRepository.findUserByEmail(anyString())).thenReturn(Optional.of(mockUser));
+//        when(userRepository.findUserByPassword(anyString())).thenReturn(Optional.of(mockUser));
+
+        assertThrows(UserDidNotLogInException.class,()->userService.userCreatedCanLogIn(email,password));
+    }
+//    @AfterEach
+//    void tearDown() {userService=null;}
 }

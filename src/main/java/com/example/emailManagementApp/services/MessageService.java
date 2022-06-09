@@ -1,6 +1,7 @@
 package com.example.emailManagementApp.services;
 
 
+import com.example.emailManagementApp.dtos.request.ForwardMessageRequest;
 import com.example.emailManagementApp.dtos.request.MessageRequest;
 import com.example.emailManagementApp.dtos.response.SentMessageResponseDto;
 import com.example.emailManagementApp.models.Message;
@@ -18,5 +19,5 @@ public interface MessageService {
 
      Message userCanFindAMessageInListOfMessageInsideInOutBox(MessageRequest messageRequest);
 
-     List<User> receivedMessageCanBeForwardedToAnotherUser(MessageRequest messageRequest);
+     List<User> receivedMessageCanBeForwardedToAnotherUser(ForwardMessageRequest forwardMessageRequest, MessageRequest messageRequest);
 }

@@ -17,11 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
@@ -186,6 +189,12 @@ class UserServiceImplTest {
 //        userService.userCheckNotificationWhenTheyLoggedIn(checkNotification);
 
         assertThrows(UserDidNotLogInNotificationException.class,()->userService.userCheckNotificationWhenTheyLoggedIn(checkNotification));
+    }
+    @Test
+    public void testThatAllUserCanBeFound(){
+        User user = new User();
+       final List<User> allUser = userService.findAllUsers(user);
+       assertEquals(allUser.size(), 3);
     }
 
 }

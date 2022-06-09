@@ -233,16 +233,17 @@ class MessageServiceImplTest {
         messageRequest.setMessageBody("It was nice finally meeting you today, hope you will attend the conference");
         messageRequest.setMessageTitle("Invitation to attend conference");
         messageRequest.setDate(LocalDateTime.now());
-        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
+//        messageService.messageCanBeSendFromOneUserToAnotherUser(messageRequest);
 
         ForwardMessageRequest forwardMessageRequest = new ForwardMessageRequest();
         forwardMessageRequest.setUserForwardMessage("seconduser@gmail.com");
         forwardMessageRequest.setReceiverForwardMessage("thirduser@gmail.com");
-        forwardMessageRequest.setForwardMessageBody(String.valueOf(messageRequest));
+        forwardMessageRequest.setForwardMessageBody(String.valueOf(MessageRequest.class));
 
-        List<User> foundUser = messageService.receivedMessageCanBeForwardedToAnotherUser(messageRequest);
+        List<User> foundUser = messageService.receivedMessageCanBeForwardedToAnotherUser(forwardMessageRequest,messageRequest);
 
-
+        assertEquals(foundUser.size(),1);
+       assertEquals(forwardMessageRequest.getForwardMessageBody(),MessageRequest.class);
     }
 
 

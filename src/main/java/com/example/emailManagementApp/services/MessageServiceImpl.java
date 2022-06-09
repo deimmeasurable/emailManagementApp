@@ -1,8 +1,10 @@
 package com.example.emailManagementApp.services;
 
 
+import com.example.emailManagementApp.dtos.request.ForwardMessageRequest;
 import com.example.emailManagementApp.dtos.request.MessageRequest;
 
+import com.example.emailManagementApp.dtos.response.ForwardMessageResponse;
 import com.example.emailManagementApp.dtos.response.SentMessageResponseDto;
 import com.example.emailManagementApp.exceptions.MessageNotFoundException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
@@ -218,8 +220,9 @@ public class MessageServiceImpl  implements MessageService {
     }
 
     @Override
-    public List<User> receivedMessageCanBeForwardedToAnotherUser(MessageRequest messageRequest) {
+    public List<User> receivedMessageCanBeForwardedToAnotherUser(ForwardMessageRequest forwardMessageRequest,MessageRequest messageRequest) {
         User foundUser = userRepository.findUserByEmail(messageRequest.getReceiver()).orElseThrow(() -> new UserDoesNotExistException("user is found"));
+        User seconduser = userRepository.findUserByEmail(forwardMessageRequest.getReceiverForwardMessage()).orElseThrow(() -> new UserDoesNotExistException("user is found"));
 
         if(foundUser.isLogInStatus()){
             foundUser.setLogInStatus(true);
@@ -234,16 +237,32 @@ public class MessageServiceImpl  implements MessageService {
         message.setMessageTitle(messageRequest.getMessageTitle());
         messageRepository.save(message);
 
+        MailBoxes mailBoxes = new MailBoxes();
+        mailBoxes.setUserName(forwardMessageRequest.getReceiverForwardMessage());
+        mailBoxes.setMailBox(new ArrayList<>());
+
 
         MailBox mailBox = new MailBox();
         mailBox.setMailboxType(MailboxType.INBOX);
-        mailBox.setMessage(new ArrayList<>());
+        mailBox.setUserName(forwardMessageRequest.getReceiverForwardMessage());
         mailBox.getMessage().add(message);
+        mailBoxes.getMailBox().add(mailBox);
+        mailBoxesRepository.save(mailBoxes);
         mailBoxRepository.save(mailBox);
+        System.out.println(mailBoxes);
+        System.out.println(mailBox);
 
+        ForwardMessageResponse forwardMessageResponse =new ForwardMessageResponse();
+        forwardMessageRequest.setUserForwardMessage(messageRequest.getUserName());
+        forwardMessageRequest.setReceiverForwardMessage(forwardMessageRequest.getReceiverForwardMessage());
+        forwardMessageRequest.setForwardMessageBody(String.valueOf(Message.class));
 
+        List<User> users = new ArrayList<>();
+        users.add(seconduser);
+
+        log.info(" new mailbox--->",seconduser);
 
         
-        return null;
+        return users;
     }
 }

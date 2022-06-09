@@ -20,6 +20,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -118,6 +120,13 @@ public class UserServiceImpl implements UserService {
             throw new UserDidNotLogInNotificationException("user didn't login, so can't check notification");
         }
 
+    }
+
+    @Override
+    public List<User> findAllUsers(User user) {
+        List<User> users=new ArrayList<>();
+        users=userRepository.findAll();
+        return users;
     }
 
 }
