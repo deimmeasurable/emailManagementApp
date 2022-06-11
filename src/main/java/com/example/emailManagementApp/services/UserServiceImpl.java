@@ -1,7 +1,6 @@
 package com.example.emailManagementApp.services;
 
 
-import com.example.emailManagementApp.dtos.request.UserRequestLogInDto;
 import com.example.emailManagementApp.dtos.response.NotificationCheckedResponse;
 import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
@@ -10,26 +9,30 @@ import com.example.emailManagementApp.exceptions.UserDidNotLogInException;
 import com.example.emailManagementApp.exceptions.UserDidNotLogInNotificationException;
 import com.example.emailManagementApp.exceptions.UserDoesNotExistException;
 import com.example.emailManagementApp.models.Notification;
+import com.example.emailManagementApp.models.Role;
 import com.example.emailManagementApp.models.User;
 import com.example.emailManagementApp.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Service
 @Slf4j
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private UserRepository userRepository;
 
@@ -52,7 +55,7 @@ public class UserServiceImpl implements UserService {
     public UserDto createUser(String email, String password) {
         Optional<User> userOptional = userRepository.findUserByEmail(email);
         if (userOptional.isEmpty()) {
-            User user = new User(email, password, new java.util.ArrayList<>(), false);
+            User user = new User(email, password);
             mailBoxesService.createMailBoxes(email);
             User savedUser = userRepository.save(user);
 
@@ -128,5 +131,28 @@ public class UserServiceImpl implements UserService {
         users=userRepository.findAll();
         return users;
     }
+
+    @Override
+    public User findUserByEmail(String email) {
+        User user = userRepository.findUserByEmail(email).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+
+        return user;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findUserByEmail(username).orElseThrow(() -> new UserDoesNotExistException("user don't exist"));
+        org.springframework.security.core.userdetails.User returnedUser = new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), getAuthorities(user.getRoles()));
+        return returnedUser;
+    }
+
+    private Collection<? extends GrantedAuthority> getAuthorities(Set<Role> roles) {
+
+        Collection<? extends SimpleGrantedAuthority> authorities=roles.stream().map(
+                role ->new SimpleGrantedAuthority(role.getRoleType().name())
+        ).collect(Collectors.toSet());
+        return authorities;
+    }
+
 
 }

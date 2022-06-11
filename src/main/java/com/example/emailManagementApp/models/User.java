@@ -21,6 +21,7 @@ import java.util.Set;
 @Document
 public class User {
     @Id
+    private String id;
     private String email;
     private String password;
     private List<Notification> notificationlist=new ArrayList<>();
@@ -35,6 +36,10 @@ public class User {
             roles = new HashSet<>();
         }
         roles.add(new Role(roleType));
+    }
+    public User(String email, String password){
+        this.email = email;
+        this.password = password;
     }
 
     public void addRole(Role role){

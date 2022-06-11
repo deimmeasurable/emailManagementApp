@@ -1,7 +1,6 @@
 package com.example.emailManagementApp.services;
 
 
-import com.example.emailManagementApp.dtos.request.UserRequestLogInDto;
 import com.example.emailManagementApp.dtos.response.NotificationCheckedResponse;
 import com.example.emailManagementApp.dtos.response.UserDto;
 import com.example.emailManagementApp.dtos.response.UserResponseLogIn;
@@ -21,4 +20,5 @@ public interface UserService {
 
 
     List<User> findAllUsers(User user);
+    User findUserByEmail(String email);
 }
